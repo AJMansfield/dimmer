@@ -83,7 +83,7 @@ void zero_cross() {
 }
 
 
-#define FADE_TIME 1800 //seconds to fade in, 600 = 10 minutes
+#define FADE_TIME 3600 //seconds to fade in, 600 = 10 minutes
 unsigned int fade_a_counter = 0;
 unsigned int fade_b_counter = 0;
 bool fade_a_cancel = false;
