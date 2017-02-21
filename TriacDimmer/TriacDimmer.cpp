@@ -1,4 +1,4 @@
-#include "dimmer.h"
+#include "TriacDimmer.h"
 
 
 void TriacDimmer::begin(){
