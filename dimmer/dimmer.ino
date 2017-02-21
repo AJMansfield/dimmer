@@ -1,5 +1,7 @@
 #include <Time.h>
 #include <TimeAlarms.h>
+#include <Wire.h>
+#include <DS1307RTC.h>
 
 #define MAINS_PERIOD 16667 //number of half-microseconds in a half-period of the mains waveform
 #define MAINS_FREQUENCY 60 
@@ -61,25 +63,25 @@ float get_ch_b(){
 	return x;
 }
 
-volatile uint64_t zcount = 0;
-uint64_t zoff = 0;
-void set_ztime(time_t time){
-	cli();
-	uint64_t zc = zcount;
-	sei();
+// volatile uint64_t zcount = 0;
+// uint64_t zoff = 0;
+// void set_ztime(time_t time){
+// 	cli();
+// 	uint64_t zc = zcount;
+// 	sei();
 
-	zoff = time * MAINS_FREQUENCY * 2 - zc;
-}
-time_t get_ztime(){
-	cli();
-	uint64_t zc = zcount;
-	sei();
+// 	zoff = time * MAINS_FREQUENCY * 2 - zc;
+// }
+// time_t get_ztime(){
+// 	cli();
+// 	uint64_t zc = zcount;
+// 	sei();
 
-	return (zoff + zc) / (MAINS_FREQUENCY * 2);
-}
+// 	return (zoff + zc) / (MAINS_FREQUENCY * 2);
+// }
 void zero_cross() {
 	TCNT1 = 0;
-	zcount++;
+	//zcount++;
 }
 
 
@@ -150,9 +152,10 @@ void setup() {
 	set_ch_b(0);
 
 	Serial.begin(9600);
-	//setSyncProvider(get_ztime);
-	setTime(12,0,0,1,1,17);
-	set_ztime(now());
+
+
+	setSyncProvider(RTC.get);
+
 
 	Alarm.timerRepeat(1, everySecond); //index 0
 
@@ -223,7 +226,7 @@ unsigned long processSyncMessage() {
 	switch(Serial.read()){
 	case TIME_HEADER:
 		t = Serial.parseInt();
-		set_ztime(t);
+		RTC.set(t);
 		setTime(t);
 		turn_off();
 		Serial.println("set time");
